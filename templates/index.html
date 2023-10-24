@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TipJar App</title>
+    <style>
+        /* Your CSS styles here */
+    </style>
+</head>
+<body>
+<header>
+    <h1>TipJar App</h1>
+</header>
+<div class="container">
+    <form id="depositForm" class="form-group">
+        <label for="userPublicKey">User Public Key:</label>
+        <input type="text" id="userPublicKey" name="userPublicKey">
+        <label for="amount">Amount (DeSo):</label>
+        <input type="number" id="amount" name="amount">
+        <button type="button" id="depositBtn">Deposit Tips</button>
+    </form>
+    <form id="distributeForm" class="form-group">
+        <label for="creatorPublicKey">Creator Public Key:</label>
+        <input type="text" id "creatorPublicKey" name="creatorPublicKey">
+        <button type="button" id="distributeBtn">Distribute Tips</button>
+    </form>
+    <p class="total-tips">Total Tips: <span id="totalTips">0 DeSo</span></p>
+    <button type="button" id="getTotalTipsBtn">Get Total Tips</button>
+
+    <!-- New functionality to set duration -->
+    <form id="setDurationForm" class="form-group">
+        <label for="newDuration">New Duration:</label>
+        <input type="number" id="newDuration" name="newDuration">
+        <button type="button" id="setDurationBtn">Set Duration</button>
+    </form>
+
+    <!-- New functionality to add a contributor -->
+    <form id="addContributorForm" class="form-group">
+        <label for="contributorPublicKey">Contributor Public Key:</label>
+        <input type="text" id="contributorPublicKey" name="contributorPublicKey">
+        <label for="contributionAmount">Contribution Amount (DeSo):</label>
+        <input type="number" id="contributionAmount" name="contributionAmount">
+        <button type="button" id="addContributorBtn">Add Contributor</button>
+    </form>
+
+    <!-- New functionality to remove a contributor -->
+    <form id="removeContributorForm" class="form-group">
+        <label for="removeContributorKey">Remove Contributor Public Key:</label>
+        <input type="text" id="removeContributorKey" name="removeContributorKey">
+        <button type="button" id="removeContributorBtn">Remove Contributor</button>
+    </form>
+</div>
+<script>
+    // Function to deposit tips
+    function depositTips() {
+        const userPublicKey = document.getElementById('userPublicKey').value;
+        const amount = document.getElementById('amount').value;
+
+        // You can add validation here to ensure user input is correct
+
+        fetch('/v1/deposit', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                userPublicKey: userPublicKey,
+                amount: amount,
+            }),
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                // Handle the response from the server (e.g., show a success message)
+                console.log(data);
+            })
+            .catch((error) => {
+                // Handle errors (e.g., show an error message)
+                console.error(error);
+            });
+    }
+
+    // Function to distribute tips
+    function distributeTips() {
+        const creatorPublicKey = document.getElementById('creatorPublicKey').value;
+
+        // You can add validation here to ensure user input is correct
+
+        fetch('/v1/distributeTips', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                creatorPublicKey: creatorPublicKey,
+            }),
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                // Handle the response from the server (e.g., show a success message)
+                console.log(data);
+            })
+            .catch((error) => {
+                // Handle errors (e.g., show an error message)
+                console.error(error);
+            });
+    }
+
+    // Function to get total tips
+    function getTotalTips() {
+        fetch('/v1/totalTips')
+            .then((response) => response.json())
+            .then((data) => {
+                // Update the UI with the total tips value
+                document.getElementById('totalTips').textContent = data.totalTips + ' DeSo';
+            })
+            .catch((error) => {
+                    // Handle errors (e.g., show an error message)
+                    console.error(error);
+                }
+            );
+    }
+
+    // Function to set the duration of the TipJar contract
+    function setDuration() {
+        const newDuration = document.getElementById("newDuration").value;
+
+        // Make an HTTP POST request to your server's endpoint
+        fetch("/v1/setDuration", {
+            method: "POST",
+            body: JSON.stringify({ newDuration }),
+            headers: {
+                "Content-Type": "application/json",
+            },
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.error) {
+                    alert("Error: " + data.error);
+                } else {
+                    alert("Duration set successfully!");
+                }
+            })
+            .catch((error) => {
+                alert("An error occurred: " + error);
+            });
+    }
+
+    // Function to add a new contributor to the TipJar contract
+    function addContributor() {
+        const contributorPublicKey = document.getElementById("contributorPublicKey").value;
+        const contributionAmount = document.getElementById("contributionAmount").value;
+
+        // Make an HTTP POST request to your server's endpoint
+        fetch("/v1/addContributor", {
+            method: "POST",
+            body: JSON.stringify({ contributorPublicKey, contributionAmount }),
+            headers: {
+                "Content-Type": "application/json",
+            },
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.error) {
+                    alert("Error: " + data.error);
+                } else {
+                    alert("Contributor added successfully!");
+                }
+            })
+            .catch((error) => {
+                alert("An error occurred: " + error);
+            });
+    }
+
+    // Function to remove a contributor from the TipJar contract
+    function removeContributor() {
+        const removeContributorKey = document.getElementById("removeContributorKey").value;
+
+        // Make an HTTP POST request to your server's endpoint
+        fetch("/v1/removeContributor", {
+            method: "POST",
+            body: JSON.stringify({ removeContributorKey }),
+            headers: {
+                "Content-Type": "application/json",
+            },
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.error) {
+                    alert("Error: " + data.error);
+                } else {
+                    alert("Contributor removed successfully!");
+                }
+            })
+            .catch((error) => {
+                alert("An error occurred: " + error);
+            });
+    }
+
+    // Attach event listeners to your buttons
+    document.getElementById('depositBtn').addEventListener('click', depositTips);
+    document.getElementById('distributeBtn').addEventListener('click', distributeTips);
+    document.getElementById('getTotalTipsBtn').addEventListener('click', getTotalTips);
+    document.getElementById('setDurationBtn').addEventListener('click', setDuration);
+    document.getElementById('addContributorBtn').addEventListener('click', addContributor);
+    document.getElementById('removeContributorBtn').addEventListener('click', removeContributor);
+</script>
+</body>
+</html>
